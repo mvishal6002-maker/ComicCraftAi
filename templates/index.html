@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#f2f4ef">
+	<title>ComicCraft AI | Create a comic</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			color-scheme: light;
+			--paper: #f2f4ef;
+			--surface: #fbfcf8;
+			--ink: #19231f;
+			--muted: #717b74;
+			--line: #dce1d9;
+			--coral: #ee7257;
+			--lime: #d9e56c;
+			--teal: #a9d5ca;
+			--mono: "DM Mono", "Courier New", monospace;
+			--sans: "Space Grotesk", "Trebuchet MS", sans-serif;
+		}
+
+		* { box-sizing: border-box; }
+
+		body {
+			margin: 0;
+			min-width: 320px;
+			min-height: 100vh;
+			background-color: var(--paper);
+			background-image: radial-gradient(#cfd6cc 0.7px, transparent 0.7px);
+			background-size: 18px 18px;
+			color: var(--ink);
+			font-family: var(--sans);
+			-webkit-font-smoothing: antialiased;
+		}
+
+		button, input, textarea { font: inherit; }
+
+		.topbar {
+			min-height: 72px;
+			padding: 0 5vw;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			border-bottom: 1px solid var(--line);
+			background: rgb(251 252 248 / 88%);
+		}
+
+		.brand {
+			display: inline-flex;
+			align-items: center;
+			gap: 11px;
+			color: var(--ink);
+			text-decoration: none;
+			font-size: 18px;
+			font-weight: 700;
+			letter-spacing: 0;
+		}
+
+		.brand-mark {
+			width: 31px;
+			height: 31px;
+			display: grid;
+			place-items: center;
+			border: 2px solid var(--ink);
+			background: var(--lime);
+			box-shadow: 3px 3px 0 var(--ink);
+			font-size: 15px;
+			font-weight: 700;
+			transform: rotate(-4deg);
+		}
+
+		.topbar-note {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			color: var(--muted);
+			font-family: var(--mono);
+			font-size: 11px;
+			text-transform: uppercase;
+		}
+
+		.live-dot {
+			width: 7px;
+			height: 7px;
+			border-radius: 50%;
+			background: #70a88c;
+			box-shadow: 0 0 0 3px #70a88c24;
+		}
+
+		main {
+			width: min(1320px, 90vw);
+			margin: 0 auto;
+			padding: 40px 0 52px;
+		}
+
+		.page-heading {
+			display: flex;
+			align-items: end;
+			justify-content: space-between;
+			gap: 24px;
+			margin-bottom: 25px;
+		}
+
+		.eyebrow {
+			margin: 0 0 8px;
+			color: #77827a;
+			font-family: var(--mono);
+			font-size: 10px;
+			letter-spacing: 0;
+			text-transform: uppercase;
+		}
+
+		h1 {
+			margin: 0;
+			font-size: 32px;
+			line-height: 1.12;
+			font-weight: 600;
+			letter-spacing: 0;
+		}
+
+		.edition {
+			padding: 8px 11px;
+			border: 1px solid var(--line);
+			background: var(--surface);
+			color: var(--muted);
+			font-family: var(--mono);
+			font-size: 10px;
+			white-space: nowrap;
+		}
+
+		.workspace {
+			display: grid;
+			grid-template-columns: minmax(330px, 0.78fr) minmax(0, 1.22fr);
+			border: 1px solid var(--line);
+			background: var(--surface);
+			box-shadow: 8px 8px 0 #19231f12;
+			animation: arrive 420ms ease-out both;
+		}
+
+		.form-panel {
+			padding: 28px 30px 30px;
+			border-right: 1px solid var(--line);
+		}
+
+		.panel-heading {
+			display: flex;
+			align-items: baseline;
+			justify-content: space-between;
+			gap: 12px;
+			margin-bottom: 24px;
+		}
+
+		h2 {
+			margin: 0;
+			font-size: 18px;
+			line-height: 1.3;
+			font-weight: 600;
+		}
+
+		.step {
+			color: var(--muted);
+			font-family: var(--mono);
+			font-size: 10px;
+			white-space: nowrap;
+		}
+
+		.field { margin-bottom: 17px; }
+
+		label {
+			display: block;
+			margin-bottom: 7px;
+			color: #34413a;
+			font-size: 12px;
+			font-weight: 600;
+		}
+
+		.optional {
+			margin-left: 5px;
+			color: #929b94;
+			font-size: 10px;
+			font-weight: 400;
+		}
+
+		input, textarea {
+			width: 100%;
+			border: 1px solid #d8ded6;
+			border-radius: 3px;
+			outline: none;
+			background: #fff;
+			color: var(--ink);
+			font-size: 13px;
+			transition: border-color 140ms ease, box-shadow 140ms ease;
+		}
+
+		input { height: 42px; padding: 0 12px; }
+		textarea { min-height: 102px; padding: 11px 12px; resize: vertical; line-height: 1.5; }
+
+		input::placeholder, textarea::placeholder { color: #a2aaa3; }
+
+		input:focus, textarea:focus {
+			border-color: #6a9b85;
+			box-shadow: 0 0 0 3px #6a9b851f;
+		}
+
+		.field-row {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 13px;
+		}
+
+		.submit-row {
+			display: flex;
+			align-items: center;
+			gap: 13px;
+			margin-top: 23px;
+		}
+
+		.generate {
+			min-height: 47px;
+			padding: 0 20px;
+			border: 1px solid var(--ink);
+			border-radius: 3px;
+			background: var(--coral);
+			box-shadow: 3px 3px 0 var(--ink);
+			color: #fff;
+			cursor: pointer;
+			font-size: 13px;
+			font-weight: 700;
+			transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+		}
+
+		.generate:hover { background: #df6148; }
+		.generate:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+		.generate:focus-visible { outline: 3px solid #6a9b85; outline-offset: 4px; }
+
+		.submit-note {
+			color: var(--muted);
+			font-family: var(--mono);
+			font-size: 9px;
+			line-height: 1.5;
+		}
+
+		.form-feedback {
+			margin: 13px 0 0;
+			color: #b24737;
+			font-size: 12px;
+		}
+
+		.preview-panel {
+			min-width: 0;
+			padding: 22px 24px 24px;
+			background: #edf1e9;
+		}
+
+		.preview-toolbar {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 16px;
+		}
+
+		.preview-label, .preview-count {
+			color: #69746c;
+			font-family: var(--mono);
+			font-size: 10px;
+			text-transform: uppercase;
+		}
+
+		.comic-page {
+			position: relative;
+			width: min(100%, 650px);
+			min-height: 450px;
+			margin: 0 auto;
+			padding: 22px;
+			display: grid;
+			grid-template-rows: 1.18fr 0.82fr;
+			gap: 12px;
+			border: 1px solid #19231f;
+			background: #fffdf7;
+			box-shadow: 5px 6px 0 #19231f20;
+			transform: rotate(-0.35deg);
+		}
+
+		.comic-panel {
+			position: relative;
+			min-height: 0;
+			overflow: hidden;
+			border: 2px solid #19231f;
+			isolation: isolate;
+		}
+
+		.panel-one {
+			background:
+				radial-gradient(circle at 72% 32%, #fff1a6 0 9%, transparent 9.4%),
+				radial-gradient(#263731 0.8px, transparent 0.9px) 0 0 / 7px 7px,
+				linear-gradient(155deg, #f18a68 0 48%, #e4bd73 48% 70%, #5b8270 70%);
+		}
+
+		.panel-one::before {
+			position: absolute;
+			z-index: -1;
+			right: -5%;
+			bottom: -31%;
+			width: 65%;
+			height: 82%;
+			border: 2px solid #19231f;
+			border-radius: 48% 48% 0 0;
+			background: #476759;
+			content: "";
+			transform: rotate(-8deg);
+		}
+
+		.panel-one::after {
+			position: absolute;
+			z-index: -1;
+			right: 26%;
+			bottom: -43%;
+			width: 52%;
+			height: 78%;
+			border: 2px solid #19231f;
+			border-radius: 50% 50% 0 0;
+			background: #8fa47a;
+			content: "";
+			transform: rotate(10deg);
+		}
+
+		.panel-tag {
+			position: absolute;
+			top: 12px;
+			left: 12px;
+			padding: 5px 7px;
+			border: 1px solid var(--ink);
+			background: #fffdf7;
+			color: var(--ink);
+			font-family: var(--mono);
+			font-size: 9px;
+			text-transform: uppercase;
+		}
+
+		.speech {
+			position: absolute;
+			top: 19%;
+			left: 8%;
+			max-width: 48%;
+			padding: 11px 14px;
+			border: 2px solid var(--ink);
+			border-radius: 48% 46% 45% 44%;
+			background: #fffdf7;
+			color: var(--ink);
+			font-size: 12px;
+			font-weight: 600;
+			line-height: 1.3;
+			text-align: center;
+			transform: rotate(-4deg);
+		}
+
+		.speech::after {
+			position: absolute;
+			right: 19%;
+			bottom: -9px;
+			width: 12px;
+			height: 12px;
+			border-right: 2px solid var(--ink);
+			border-bottom: 2px solid var(--ink);
+			background: #fffdf7;
+			content: "";
+			transform: skew(20deg) rotate(38deg);
+		}
+
+		.panel-two {
+			display: grid;
+			grid-template-columns: 1fr 0.74fr;
+			background: #a9d5ca;
+		}
+
+		.panel-two-art {
+			position: relative;
+			overflow: hidden;
+			background:
+				radial-gradient(circle at 52% 48%, #e4bd73 0 15%, transparent 15.6%),
+				radial-gradient(#19231f 0.8px, transparent 0.9px) 0 0 / 7px 7px,
+				#a9d5ca;
+		}
+
+		.panel-two-art::before, .panel-two-art::after {
+			position: absolute;
+			bottom: -42%;
+			width: 62%;
+			height: 93%;
+			border: 2px solid var(--ink);
+			border-radius: 50% 50% 0 0;
+			content: "";
+		}
+
+		.panel-two-art::before { left: 2%; background: #ee7257; transform: rotate(-12deg); }
+		.panel-two-art::after { right: -8%; background: #476759; transform: rotate(12deg); }
+
+		.panel-caption {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			padding: 15px;
+			border-left: 2px solid var(--ink);
+			background: #f5df92;
+		}
+
+		.caption-kicker {
+			margin: 0 0 8px;
+			color: #526359;
+			font-family: var(--mono);
+			font-size: 8px;
+			text-transform: uppercase;
+		}
+
+		.caption-title {
+			margin: 0;
+			font-size: 16px;
+			line-height: 1.15;
+			font-weight: 700;
+		}
+
+		.preview-footer {
+			display: flex;
+			justify-content: space-between;
+			gap: 12px;
+			width: min(100%, 650px);
+			margin: 15px auto 0;
+			color: #788279;
+			font-family: var(--mono);
+			font-size: 9px;
+			text-transform: uppercase;
+		}
+
+		@keyframes arrive {
+			from { opacity: 0; transform: translateY(8px); }
+			to { opacity: 1; transform: translateY(0); }
+		}
+
+		@media (max-width: 900px) {
+			main { width: min(720px, 92vw); padding-top: 30px; }
+			.workspace { grid-template-columns: 1fr; }
+			.form-panel { border-right: 0; border-bottom: 1px solid var(--line); }
+			.preview-panel { padding: 20px; }
+			.comic-page { min-height: 390px; }
+		}
+
+		@media (max-width: 540px) {
+			.topbar { min-height: 62px; padding: 0 5vw; }
+			.brand { font-size: 16px; }
+			.topbar-note { font-size: 9px; }
+			main { padding-top: 26px; }
+			.page-heading { align-items: start; flex-direction: column; gap: 12px; }
+			h1 { font-size: 27px; }
+			.form-panel { padding: 23px 19px; }
+			.field-row { grid-template-columns: 1fr; gap: 0; }
+			.submit-row { align-items: start; flex-direction: column; }
+			.generate { width: 100%; }
+			.preview-panel { padding: 16px 12px; }
+			.comic-page { min-height: 300px; padding: 12px; gap: 8px; }
+			.speech { font-size: 10px; padding: 8px 10px; }
+			.panel-caption { padding: 9px; }
+			.caption-title { font-size: 13px; }
+			.preview-footer { font-size: 8px; }
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			*, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+		}
+	</style>
+</head>
+<body>
+	<header class="topbar">
+		<a class="brand" href="/" aria-label="ComicCraft AI home">
+			<span class="brand-mark" aria-hidden="true">C</span>
+			<span>ComicCraft AI</span>
+		</a>
+		<div class="topbar-note"><span class="live-dot" aria-hidden="true"></span>Studio / New issue</div>
+	</header>
+
+	<main>
+		<div class="page-heading">
+			<div>
+				<p class="eyebrow">Creator studio &nbsp; / &nbsp; 001</p>
+				<h1>Make a little noise.</h1>
+			</div>
+			<div class="edition">UNTITLED ISSUE &nbsp; NO. 01</div>
+		</div>
+
+		<section class="workspace" aria-label="Comic creator">
+			<div class="form-panel">
+				<div class="panel-heading">
+					<h2>Story setup</h2>
+					<span class="step">01 — 05</span>
+				</div>
+
+				<form action="/generate" method="post">
+					<div class="field">
+						<label for="prompt">Story prompt</label>
+						<textarea id="prompt" name="prompt" placeholder="A courier finds a tiny lighthouse in the middle of a city park..." required>{% if form_values %}{{ form_values.prompt }}{% endif %}</textarea>
+					</div>
+
+					<div class="field-row">
+						<div class="field">
+							<label for="character">Character name <span class="optional">optional</span></label>
+							<input id="character" name="character_name" type="text" placeholder="Mara Vale" value="{% if form_values %}{{ form_values.character_name }}{% endif %}">
+						</div>
+						<div class="field">
+							<label for="setting">Setting <span class="optional">optional</span></label>
+							<input id="setting" name="setting" type="text" placeholder="A rainy rooftop" value="{% if form_values %}{{ form_values.setting }}{% endif %}">
+						</div>
+					</div>
+
+					<div class="field-row">
+						<div class="field">
+							<label for="tone">Tone <span class="optional">optional</span></label>
+							<input id="tone" name="tone" type="text" placeholder="Playful, mysterious" value="{% if form_values %}{{ form_values.tone }}{% endif %}">
+						</div>
+						<div class="field">
+							<label for="art-style">Art style <span class="optional">optional</span></label>
+							<input id="art-style" name="art_style" type="text" placeholder="Bold ink and halftone" value="{% if form_values %}{{ form_values.art_style }}{% endif %}">
+						</div>
+					</div>
+
+					{% if error_message %}<p class="form-feedback" role="alert">{{ error_message }}</p>{% endif %}
+					<div class="submit-row">
+						<button class="generate" type="submit">Generate Comic</button>
+						<span class="submit-note">YOUR NEXT PANEL<br>STARTS HERE</span>
+					</div>
+				</form>
+			</div>
+
+			<div class="preview-panel">
+				<div class="preview-toolbar">
+					<span class="preview-label">{% if submitted %}Brief received{% else %}Page preview{% endif %}</span>
+					<span class="preview-count">{% if submitted %}Text only{% else %}02 panels{% endif %}</span>
+				</div>
+
+				<div class="comic-page" aria-label="Illustrated two-panel comic preview">
+					<div class="comic-panel panel-one">
+						<span class="panel-tag">Panel 01</span>
+						<span class="speech">{% if submitted %}Brief received!{% else %}Somewhere, the story begins...{% endif %}</span>
+					</div>
+					<div class="comic-panel panel-two">
+						<div class="panel-two-art" aria-hidden="true"></div>
+						<div class="panel-caption">
+							<p class="caption-kicker">{% if submitted %}Generation status{% else %}To be continued{% endif %}</p>
+							<p class="caption-title">{% if submitted %}Image generation is not enabled yet.{% else %}The first page is yours.{% endif %}</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="preview-footer">
+					<span>Draft canvas</span>
+					<span>Letter / Portrait</span>
+				</div>
+			</div>
+		</section>
+	</main>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f2f4ef">
+  <title>{{ title }} | ComicCraft AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f2f4ef;
+      --surface: #fbfcf8;
+      --ink: #19231f;
+      --muted: #717b74;
+      --line: #dce1d9;
+      --coral: #ee7257;
+      --mono: "DM Mono", "Courier New", monospace;
+      --sans: "Space Grotesk", "Trebuchet MS", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      background: var(--paper) radial-gradient(#cfd6cc 0.7px, transparent 0.7px) 0 0 / 18px 18px;
+      color: var(--ink);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; }
+    .topbar {
+      min-height: 72px;
+      padding: 0 5vw;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+      background: rgb(251 252 248 / 90%);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 11px; font-size: 18px; font-weight: 700; text-decoration: none; }
+    .brand-mark { width: 31px; height: 31px; display: grid; place-items: center; border: 2px solid var(--ink); background: #d9e56c; box-shadow: 3px 3px 0 var(--ink); transform: rotate(-4deg); }
+    .top-note, .eyebrow, .tag, .download, .back-link, summary { font-family: var(--mono); text-transform: uppercase; }
+    .top-note { color: var(--muted); font-size: 10px; }
+    main { width: min(1120px, 90vw); margin: 0 auto; padding: 36px 0 54px; }
+    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 28px; }
+    .back-link { color: #58675e; font-size: 10px; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+    .download { min-height: 42px; padding: 0 14px; display: inline-flex; align-items: center; border: 1px solid var(--ink); border-radius: 3px; background: var(--coral); box-shadow: 3px 3px 0 var(--ink); color: white; font-size: 10px; font-weight: 500; text-decoration: none; }
+    .eyebrow { margin: 0 0 8px; color: var(--muted); font-size: 10px; }
+    h1 { margin: 0; font-size: 34px; line-height: 1.15; font-weight: 600; overflow-wrap: anywhere; }
+    .subline { margin: 10px 0 22px; color: #5f6d63; font-size: 13px; }
+    .tag { display: inline-block; margin: 0 0 14px; padding: 6px 8px; border: 1px solid #c5d1c5; background: #e9eee2; color: #496250; font-size: 9px; }
+    .page-frame { padding: 18px; border: 1px solid var(--line); background: #e9eee7; box-shadow: 7px 7px 0 #19231f12; }
+    .page-image { display: block; width: min(100%, 650px); height: auto; margin: 0 auto; border: 1px solid #19231f; background: white; }
+    .panels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
+    figure { min-width: 0; margin: 0; border: 1px solid var(--line); background: var(--surface); }
+    figure img { display: block; width: 100%; height: auto; border-bottom: 1px solid var(--line); }
+    figcaption { padding: 11px 13px; color: #56635a; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+    figcaption strong { display: block; margin-bottom: 4px; color: var(--ink); font-family: var(--mono); font-size: 9px; font-weight: 500; text-transform: uppercase; }
+    .text-sections { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+    details { min-width: 0; padding: 15px 17px; border: 1px solid var(--line); background: var(--surface); }
+    summary { cursor: pointer; font-size: 10px; font-weight: 500; }
+    details p, details pre { margin: 14px 0 0; color: #49564e; font-size: 13px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+    @media (max-width: 650px) {
+      .topbar { min-height: 62px; }
+      .top-note { font-size: 8px; }
+      main { padding-top: 25px; }
+      h1 { font-size: 27px; }
+      .toolbar { align-items: flex-start; }
+      .download { padding: 0 10px; font-size: 9px; }
+      .page-frame { padding: 9px; }
+      .panels, .text-sections { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="ComicCraft AI home">
+      <span class="brand-mark" aria-hidden="true">C</span>
+      <span>ComicCraft AI</span>
+    </a>
+    <span class="top-note">Studio / Finished draft</span>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <a class="back-link" href="/">&larr; Create another</a>
+      <a class="download" href="{{ pdf_url }}" download>Download comic PDF</a>
+    </div>
+
+    <p class="eyebrow">Generated comic / {{ panel_count }} panels</p>
+    <h1>{{ title }}</h1>
+    <p class="subline">Outline and story generated with {{ writing_provider }}. Image provider: {{ image_provider }}.</p>
+    {% if image_provider == "placeholder" %}<span class="tag">Panel artwork is clearly labeled placeholder art</span>{% endif %}
+
+    <section class="page-frame" aria-label="Comic page preview">
+      <img class="page-image" src="{{ comic_page_url }}" alt="Composed comic page for {{ title }}">
+    </section>
+
+    <section class="panels" aria-label="Individual comic panels">
+      {% for panel in panel_images %}
+      <figure>
+        <img src="{{ panel.url }}" alt="Placeholder illustration for panel {{ loop.index }}">
+        <figcaption><strong>Panel {{ loop.index }}</strong>{{ panel.caption }}</figcaption>
+      </figure>
+      {% endfor %}
+    </section>
+
+    <section class="text-sections" aria-label="Generated writing">
+      <details open>
+        <summary>Story outline</summary>
+        <pre>{{ outline }}</pre>
+      </details>
+      <details>
+        <summary>Full story</summary>
+        <pre>{{ story }}</pre>
+      </details>
+    </section>
+  </main>
+</body>
+</html>
